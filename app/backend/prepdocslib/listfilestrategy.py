@@ -32,6 +32,15 @@ class File:
 
     def file_extension(self):
         return os.path.splitext(self.content.name)[1]
+    
+    def file_path(self):
+        return os.path.dirname(self.content.name)
+    
+    def file_class(self):
+        if "videos" in os.path.normpath(self.content.name).split(os.sep):
+            return "video"
+        else:
+            return "general"
 
     def filename_to_id(self):
         filename_ascii = re.sub("[^0-9a-zA-Z_-]", "_", self.filename())
