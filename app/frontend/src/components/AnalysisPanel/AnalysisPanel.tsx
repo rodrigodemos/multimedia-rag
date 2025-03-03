@@ -66,6 +66,8 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
                 return <img src={citation} className={styles.citationImg} alt="Citation Image" />;
             case "md":
                 return <MarkdownViewer src={activeCitation} />;
+            case "mp4":
+                return <iframe title="Test" src={citation} width="100%" height={citationHeight} />;
             default:
                 return <iframe title="Citation" src={citation} width="100%" height={citationHeight} />;
         }

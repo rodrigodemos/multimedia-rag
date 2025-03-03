@@ -53,8 +53,11 @@ class VideoMapper:
                 "startTimeInSeconds": videoStartTime
             }
         }
-        referralInfoStr = json.dumps(playbackOptions)
-        encodedInfo = urllib.parse.quote(base64.b64encode(referralInfoStr.encode('utf-8')).decode('utf-8'))
+        referralInfoStr = json.dumps(referralInfo)
+        playbackOptionsStr = json.dumps(playbackOptions)
+        # encodedInfo = urllib.parse.quote(base64.b64encode(referralInfoStr.encode('utf-8')).decode('utf-8'))
+        encodedInfo = urllib.parse.quote(referralInfoStr)
+
         return encodedInfo
 
     def get_video_properties(self):

@@ -37,6 +37,7 @@ class Document:
     category: Optional[str]
     sourcepage: Optional[str]
     sourcefile: Optional[str]
+    storageUrl: Optional[str]
     oids: Optional[List[str]]
     groups: Optional[List[str]]
     captions: List[QueryCaptionResult]
@@ -52,6 +53,7 @@ class Document:
             "category": self.category,
             "sourcepage": self.sourcepage,
             "sourcefile": self.sourcefile,
+            "storageUrl": self.storageUrl,
             "oids": self.oids,
             "groups": self.groups,
             "captions": (
@@ -185,6 +187,7 @@ class Approach(ABC):
                         category=document.get("category"),
                         sourcepage=document.get("sourcepage"),
                         sourcefile=document.get("sourcefile"),
+                        storageUrl=document.get("storageUrl"),
                         oids=document.get("oids"),
                         groups=document.get("groups"),
                         captions=cast(List[QueryCaptionResult], document.get("@search.captions")),
@@ -204,6 +207,18 @@ class Approach(ABC):
 
         return qualified_documents
 
+    def get_citation_source(self, doc: Document) -> str:
+        if doc.category == "video:msStream":
+            return doc.sourcefile or ""
+        else:
+            return doc.sourcepage or ""     
+        
+    def get_citation_url(self, doc: Document) -> str:
+        if doc.category == "video:msStream":
+            return f"({doc.storageUrl})" or ""
+        else:
+            return ""        
+
     def get_sources_content(
         self, results: List[Document], use_semantic_captions: bool, use_image_citation: bool
     ) -> list[str]:
@@ -220,7 +235,7 @@ class Approach(ABC):
             ]
         else:
             return [
-                (self.get_citation((doc.sourcepage or ""), use_image_citation)) + ": " + nonewlines(doc.content or "")
+                (self.get_citation(self.get_citation_source(doc), use_image_citation)) + (self.get_citation_url(doc)) + ": " + nonewlines(doc.content or "")
                 for doc in results
             ]
 

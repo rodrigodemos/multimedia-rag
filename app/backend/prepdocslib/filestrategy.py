@@ -110,7 +110,7 @@ class FileStrategy(Strategy):
                         url = videoFile.videoUrl if fileClass == "video" else file.url
                         if self.image_embeddings and blob_sas_uris:
                             blob_image_embeddings = await self.image_embeddings.create_embeddings(blob_sas_uris)
-                        await search_manager.update_content(sections, blob_image_embeddings, url=url)
+                        await search_manager.update_content(sections, blob_image_embeddings, url=url, masterFile=videoFile.videoName)
                 finally:
                     if file:
                         file.close()

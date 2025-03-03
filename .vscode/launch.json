@@ -34,6 +34,16 @@
             "cwd": "${workspaceFolder}/app/frontend",
         },
         {
+            "name": "Frontend (Edge)",
+            "type": "msedge",
+            "request": "launch",
+            "url": "http://127.0.0.1:50505",
+            "webRoot": "${workspaceFolder}/app/frontend",
+            "sourceMapPathOverrides": {
+                "/*": "${webRoot}/*"
+            }
+        },
+        {
             "name": "Tests (Python)",
             "type": "debugpy",
             "request": "launch",
