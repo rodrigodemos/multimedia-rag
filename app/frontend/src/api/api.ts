@@ -79,7 +79,12 @@ export async function getSpeechApi(text: string): Promise<string | null> {
 }
 
 export function getCitationFilePath(citation: string): string {
-    return `${BACKEND_URI}/content/${citation}`;
+    // if citation is from sharepoint https://*.sharepoint.com/
+    if (citation.includes("https://") && citation.includes("sharepoint.com/")) {
+        return citation;
+    } else {
+        return `${BACKEND_URI}/content/${citation}`;
+    }
 }
 
 export async function uploadFileApi(request: FormData, idToken: string): Promise<SimpleAPIResponse> {

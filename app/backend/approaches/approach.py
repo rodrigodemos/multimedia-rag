@@ -209,7 +209,12 @@ class Approach(ABC):
 
     def get_citation_source(self, doc: Document) -> str:
         if doc.category == "video:msStream":
-            return doc.sourcefile or ""
+            
+            srcfilenoext = os.path.splitext(doc.sourcefile or "")[0]
+            srcpagenoext = os.path.splitext(doc.sourcepage or "")[0]
+            pagenofilename = srcpagenoext.replace(srcfilenoext, "", 1)
+            videocitation = doc.sourcefile + "#" + pagenofilename[1:]
+            return videocitation or ""
         else:
             return doc.sourcepage or ""     
         

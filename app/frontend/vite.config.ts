@@ -27,6 +27,7 @@ export default defineConfig({
         target: "esnext"
     },
     server: {
+        hmr: true,
         proxy: {
             "/content/": "http://localhost:50505",
             "/auth_setup": "http://localhost:50505",

@@ -39,9 +39,8 @@
             "request": "launch",
             "url": "http://127.0.0.1:50505",
             "webRoot": "${workspaceFolder}/app/frontend",
-            "sourceMapPathOverrides": {
-                "/*": "${webRoot}/*"
-            }
+            "sourceMaps": true,
+            "trace": true,
         },
         {
             "name": "Tests (Python)",
@@ -56,7 +55,7 @@
     "compounds": [
         {
           "name": "Frontend & Backend",
-          "configurations": ["Backend (Python)", "Frontend"],
+          "configurations": ["Backend (Python)", "Frontend", "Frontend (Edge)"],
           "stopAll": true
         }
     ]

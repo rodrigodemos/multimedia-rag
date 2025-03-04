@@ -38,6 +38,14 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
             // Get hash from the URL as it may contain #page=N
             // which helps browser PDF renderer jump to correct page N
             const originalHash = activeCitation.indexOf("#") ? activeCitation.split("#")[1] : "";
+
+            // Don't fetch blob if citation is a SharePoint URL
+            if (activeCitation.includes("https://") && activeCitation.includes("sharepoint.com/")) {
+                // SharePoint URL
+                setCitation(activeCitation);
+                return;
+            }
+
             const response = await fetch(activeCitation, {
                 method: "GET",
                 headers: await getHeaders(token)
@@ -66,8 +74,6 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
                 return <img src={citation} className={styles.citationImg} alt="Citation Image" />;
             case "md":
                 return <MarkdownViewer src={activeCitation} />;
-            case "mp4":
-                return <iframe title="Test" src={citation} width="100%" height={citationHeight} />;
             default:
                 return <iframe title="Citation" src={citation} width="100%" height={citationHeight} />;
         }
