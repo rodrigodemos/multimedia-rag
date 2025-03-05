@@ -1,6 +1,6 @@
 {
-    "pageTitle": "Azure OpenAI + AI Search",
-    "headerTitle": "Azure OpenAI + AI Search",
+    "pageTitle": "Azure Multimedia RAG",
+    "headerTitle": "Azure Multimedia RAG",
     "chat": "チャット",
     "qa": "一問一答",
     "login": "ログイン",
@@ -37,10 +37,10 @@
     "chatEmptyStateTitle": "データを用いてチャットを行います",
     "chatEmptyStateSubtitle": "ご自由にお問い合わせいただくか、もしくは下記のサンプルをお試しください",
     "defaultExamples": {
-        "1": "私が契約中の Northwind Health Plus の標準プランには何が含まれ、何が含まれないのですか？",
-        "2": "パフォーマンス・レビューで何を行いますか？",
-        "3": "プロダクトマネージャーの職務内容について教えてください。",
-        "placeholder": "新しい質問を入力してください (例：私の契約プランは年1回の眼科検診もカバーしていますか？)"
+        "1": "Microsoft Fabricとは？",
+        "2": "高度なハンティング技術の例",
+        "3": "Microsoft Fabricにおける条件付きアクセス・ポリシーの説明",
+        "placeholder": "新しい質問を入力してください (例：Fabric Private Links)"
     },
     "askTitle": "データを利用した問い合わせ",
     "gpt4vExamples": {

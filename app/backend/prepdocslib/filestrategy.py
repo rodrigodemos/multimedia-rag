@@ -107,10 +107,15 @@ class FileStrategy(Strategy):
                     if sections:
                         blob_sas_uris = await self.blob_manager.upload_blob(file)
                         blob_image_embeddings: Optional[List[List[float]]] = None
-                        url = videoFile.videoUrl if fileClass == "video" else file.url
+                        masterFile = None
+                        if fileClass == "video":
+                            url = videoFile.videoUrl
+                            masterFile = videoFile.videoName
+                        else:
+                            url = file.url
                         if self.image_embeddings and blob_sas_uris:
                             blob_image_embeddings = await self.image_embeddings.create_embeddings(blob_sas_uris)
-                        await search_manager.update_content(sections, blob_image_embeddings, url=url, masterFile=videoFile.videoName)
+                        await search_manager.update_content(sections, blob_image_embeddings, url=url, masterFile=masterFile)
                 finally:
                     if file:
                         file.close()

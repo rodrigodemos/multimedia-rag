@@ -582,8 +582,10 @@ var openAiDeployments = concat(
       ]
     : []
 )
+@description('Skip creating a new OpenAI resource if one already exists')
+param skipOpenAi bool = false
 
-module openAi 'br/public:avm/res/cognitive-services/account:0.7.2' = if (isAzureOpenAiHost && deployAzureOpenAi) {
+module openAi 'br/public:avm/res/cognitive-services/account:0.7.2' = if (isAzureOpenAiHost && deployAzureOpenAi && !skipOpenAi) {
   name: 'openai'
   scope: openAiResourceGroup
   params: {

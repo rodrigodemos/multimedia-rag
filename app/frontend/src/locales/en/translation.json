@@ -37,10 +37,10 @@
     "chatEmptyStateTitle": "Chat with your data",
     "chatEmptyStateSubtitle": "Ask anything or try an example",
     "defaultExamples": {
-        "1": "Where is a truck?",
-        "2": "What is the scene with a white horse?",
-        "3": "Explain the scene of the snowy forest",
-        "placeholder": "Type a new question (e.g. Scenes with sportscars)"
+        "1": "What is Microsoft Fabric?",
+        "2": "Examples of Advanced Hunting techniques",
+        "3": "Explain Conditional Access Policies in Microsoft Fabric", 
+        "placeholder": "Type a new question (e.g. Fabric Private Links)"
     },
     "askTitle": "Ask your data",
     "gpt4vExamples": {

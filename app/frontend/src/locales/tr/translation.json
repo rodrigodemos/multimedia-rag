@@ -37,10 +37,10 @@
     "chatEmptyStateTitle": "Verilerinizle sohbet edin",
     "chatEmptyStateSubtitle": "Bir soru sorun veya bir örnek deneyin",
     "defaultExamples": {
-        "1": "Northwind Health Plus planımda standart planda olmayan neler var?",
-        "2": "Performans değerlendirmesinde ne olur?",
-        "3": "Bir Ürün Yöneticisi ne yapar?",
-        "placeholder": "Yeni bir soru yazın (ör. planım yıllık göz muayenelerini kapsıyor mu?)"
+        "1": "Microsoft Fabric nedir?",
+        "2": "Gelişmiş Avcılık tekniklerine örnekler",
+        "3": "Microsoft Fabric'deki Koşullu Erişim Politikalarını açıklayın",
+        "placeholder": "Yeni bir soru yazın (örneğin: Fabric Özel Bağlantıları)"
     },
     "askTitle": "Verilerinize sorun",
     "gpt4vExamples": {

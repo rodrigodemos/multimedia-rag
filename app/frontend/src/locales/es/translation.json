@@ -1,6 +1,6 @@
 {
-    "pageTitle": "Azure OpenAI + AI Search",
-    "headerTitle": "Azure OpenAI + AI Search",
+    "pageTitle": "Azure Multimedia RAG",
+    "headerTitle": "Azure Multimedia RAG",
     "chat": "Chat",
     "qa": "Haz una pregunta",
     "login": "Iniciar sesión",
@@ -37,10 +37,10 @@
     "chatEmptyStateTitle": "Chatea con tus datos",
     "chatEmptyStateSubtitle": "Pregunta cualquier cosa o prueba un ejemplo",
     "defaultExamples": {
-        "1": "¿Qué está incluido en mi plan Northwind Health Plus que no está en el estándar?",
-        "2": "¿Qué sucede en una revisión de rendimiento?",
-        "3": "¿Qué hace un Gerente de producto?",
-        "placeholder": "Escribe una nueva pregunta (por ejemplo, ¿mi plan cubre exámenes anuales de la vista?)"
+        "1": "¿Qué es Microsoft Fabric?",
+        "2": "Ejemplos de técnicas de caza avanzada",
+        "3": "Explicar las políticas de acceso condicional en Microsoft Fabric",
+        "placeholder": "Escribe una nueva pregunta (por ejemplo, Enlaces privados de Fabric)"
     },
     "askTitle": "Pregunta a tus datos",
     "gpt4vExamples": {
