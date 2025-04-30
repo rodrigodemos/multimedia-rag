@@ -94,7 +94,7 @@ cryptography==44.0.0
     #   azure-storage-blob
     #   msal
     #   pyjwt
-deprecated==1.2.14
+deprecated==1.2.18
     # via
     #   opentelemetry-api
     #   opentelemetry-semantic-conventions
