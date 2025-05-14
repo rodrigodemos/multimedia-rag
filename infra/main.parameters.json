@@ -304,6 +304,12 @@
     },
     "useMediaDescriberAzureCU": {
       "value": "${USE_MEDIA_DESCRIBER_AZURE_CU=false}"
+    },
+    "containerRegistryCustomName": {
+      "value": "${AZURE_CONTAINER_REGISTRY_NAME}"
+    },
+    "acaIdentityCustomName": {
+      "value": "${AZURE_CONTAINER_APPS_IDENTITY_NAME}"
     }
   }
 }

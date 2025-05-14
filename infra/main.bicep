@@ -13,6 +13,9 @@ param appServicePlanName string = '' // Set in main.parameters.json
 param backendServiceName string = '' // Set in main.parameters.json
 param resourceGroupName string = '' // Set in main.parameters.json
 
+param containerRegistryCustomName string // Set in main.parameters.json
+param acaIdentityCustomName string // Set in main.parameters.json
+
 param applicationInsightsDashboardName string = '' // Set in main.parameters.json
 param applicationInsightsName string = '' // Set in main.parameters.json
 param logAnalyticsName string = '' // Set in main.parameters.json
@@ -84,6 +87,7 @@ param chatHistoryVersion string = 'cosmosdb-v2'
   'uksouth'
   'japaneast'
   'northcentralus'
+  'southcentralus'
   'australiaeast'
   'swedencentral'
 ])
@@ -106,7 +110,7 @@ param documentIntelligenceResourceGroupName string = '' // Set in main.parameter
 // Limited regions for new version:
 // https://learn.microsoft.com/azure/ai-services/document-intelligence/concept-layout
 @description('Location for the Document Intelligence resource group')
-@allowed(['eastus', 'westus2', 'westeurope'])
+@allowed(['southcentralus', 'eastus', 'westus2', 'westeurope'])
 @metadata({
   azd: {
     type: 'location'
@@ -133,9 +137,9 @@ param chatGptDeploymentCapacity int = 0
 var chatGpt = {
   modelName: !empty(chatGptModelName)
     ? chatGptModelName
-    : startsWith(openAiHost, 'azure') ? 'gpt-35-turbo' : 'gpt-3.5-turbo'
-  deploymentName: !empty(chatGptDeploymentName) ? chatGptDeploymentName : 'chat'
-  deploymentVersion: !empty(chatGptDeploymentVersion) ? chatGptDeploymentVersion : '0125'
+    : startsWith(openAiHost, 'azure') ? 'gpt-4o' : 'gpt-4o'
+  deploymentName: !empty(chatGptDeploymentName) ? chatGptDeploymentName : 'gpt-4o'
+  deploymentVersion: !empty(chatGptDeploymentVersion) ? chatGptDeploymentVersion : '2024-05-13'
   deploymentSkuName: !empty(chatGptDeploymentSkuName) ? chatGptDeploymentSkuName : 'Standard'
   deploymentCapacity: chatGptDeploymentCapacity != 0 ? chatGptDeploymentCapacity : 30
 }
@@ -163,7 +167,7 @@ param gpt4vDeploymentCapacity int = 0
 var gpt4v = {
   modelName: !empty(gpt4vModelName) ? gpt4vModelName : 'gpt-4o'
   deploymentName: !empty(gpt4vDeploymentName) ? gpt4vDeploymentName : 'gpt-4o'
-  deploymentVersion: !empty(gpt4vModelVersion) ? gpt4vModelVersion : '2024-08-06'
+  deploymentVersion: !empty(gpt4vModelVersion) ? gpt4vModelVersion : '2024-05-13'
   deploymentSkuName: !empty(gpt4vDeploymentSkuName) ? gpt4vDeploymentSkuName : 'Standard'
   deploymentCapacity: gpt4vDeploymentCapacity != 0 ? gpt4vDeploymentCapacity : 10
 }
@@ -252,11 +256,10 @@ param azureContainerAppsWorkloadProfile string
 
 @allowed(['appservice', 'containerapps'])
 param deploymentTarget string = 'appservice'
-param acaIdentityName string = deploymentTarget == 'containerapps' ? '${environmentName}-aca-identity' : ''
+param acaIdentityName string = !empty(acaIdentityCustomName) ? acaIdentityCustomName 
+  : (deploymentTarget == 'containerapps' ? '${environmentName}-aca-identity' : '')
 param acaManagedEnvironmentName string = deploymentTarget == 'containerapps' ? '${environmentName}-aca-env' : ''
-param containerRegistryName string = deploymentTarget == 'containerapps'
-  ? '${replace(toLower(environmentName), '-', '')}acr'
-  : ''
+param containerRegistryName string = deploymentTarget == 'containerapps' ? '${replace(toLower(environmentName), '-', '')}acr' : ''
 
 // Configure CORS for allowing different web apps to use the backend
 // For more information please see https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
@@ -473,7 +476,7 @@ module containerApps 'core/host/container-apps.bicep' = if (deploymentTarget == 
     location: location
     workloadProfile: azureContainerAppsWorkloadProfile
     containerAppsEnvironmentName: acaManagedEnvironmentName
-    containerRegistryName: '${containerRegistryName}${resourceToken}'
+    containerRegistryName: !empty(containerRegistryCustomName) ? containerRegistryCustomName : '${containerRegistryName}${resourceToken}'
     logAnalyticsWorkspaceResourceId: useApplicationInsights ? monitoring.outputs.logAnalyticsWorkspaceId : ''
   }
 }
