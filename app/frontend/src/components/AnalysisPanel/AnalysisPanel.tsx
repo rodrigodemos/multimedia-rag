@@ -40,7 +40,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
             const originalHash = activeCitation.indexOf("#") ? activeCitation.split("#")[1] : "";
 
             // Don't fetch blob if citation is a SharePoint URL
-            if (activeCitation.includes("https://") && activeCitation.includes("sharepoint.com/")) {
+            if (activeCitation.includes("https://") && (activeCitation.includes("sharepoint.com/") || activeCitation.includes("youtube.com/"))) {
                 // SharePoint URL
                 setCitation(activeCitation);
                 return;

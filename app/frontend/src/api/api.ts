@@ -80,7 +80,7 @@ export async function getSpeechApi(text: string): Promise<string | null> {
 
 export function getCitationFilePath(citation: string): string {
     // if citation is from sharepoint https://*.sharepoint.com/
-    if (citation.includes("https://") && citation.includes("sharepoint.com/")) {
+    if (citation.includes("https://") && (citation.includes("sharepoint.com/") || citation.includes("youtube.com/"))) {
         return citation;
     } else {
         return `${BACKEND_URI}/content/${citation}`;

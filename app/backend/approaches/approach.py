@@ -208,7 +208,7 @@ class Approach(ABC):
         return qualified_documents
 
     def get_citation_source(self, doc: Document) -> str:
-        if doc.category == "video:msStream":
+        if doc.category in ["video:msStream", "video:youtube"]:
             
             srcfilenoext = os.path.splitext(doc.sourcefile or "")[0]
             srcpagenoext = os.path.splitext(doc.sourcepage or "")[0]
@@ -219,7 +219,7 @@ class Approach(ABC):
             return doc.sourcepage or ""     
         
     def get_citation_url(self, doc: Document) -> str:
-        if doc.category == "video:msStream":
+        if doc.category in ["video:msStream", "video:youtube"]:
             return f"({doc.storageUrl})" or ""
         else:
             return ""        

@@ -36,29 +36,19 @@ class VideoMapper:
         videomd = data.get("markdown")
         videoStartTime = to_seconds(videomd.split("# Shot ")[1].split(" =>")[0])
 
-        referralInfo = {
-            "referralInfo": {
-                "referralApp": "StreamWebApp",
-                "referralView": "ShareDialog-Link",
-                "referralAppPlatform": "Web",
-                "referralMode": "view"
-            },
-            "playbackOptions": {
-                "startTimeInSeconds": videoStartTime
+        if self.videoKind == "msStream":
+            playbackOptions = {
+                "playbackOptions": {
+                    "startTimeInSeconds": videoStartTime
+                }
             }
-        } 
+            playbackOptionsStr = json.dumps(playbackOptions)
+            video_ts = urllib.parse.quote(playbackOptionsStr)
+        
+        if self.videoKind == "youtube":
+            video_ts = str(int(videoStartTime))
 
-        playbackOptions = {
-            "playbackOptions": {
-                "startTimeInSeconds": videoStartTime
-            }
-        }
-        referralInfoStr = json.dumps(referralInfo)
-        playbackOptionsStr = json.dumps(playbackOptions)
-        # encodedInfo = urllib.parse.quote(base64.b64encode(referralInfoStr.encode('utf-8')).decode('utf-8'))
-        encodedInfo = urllib.parse.quote(playbackOptionsStr)
-
-        return encodedInfo
+        return video_ts
 
     def get_video_properties(self):
         #if current file is xml ignore
@@ -80,11 +70,12 @@ class VideoMapper:
 
         if self.videoKind == "msStream":
             videoTs = self.get_video_ts()
-            #if needs full encoding (not embedding)
-            # self.videoUrl = f"{self.videoUrl}?csf=1&web=1&nav={videoTs}"
-            #if iframe embedding
             self.videoUrl = f"{self.videoUrl}&nav={videoTs}"
 
-
-        
-    
+        if self.videoKind == "youtube":
+            videoTs = self.get_video_ts()
+            #if self.videoUrl has a ? then add &start=videoTs else add ?start=videoTs
+            if "?" in self.videoUrl:
+                self.videoUrl = f"{self.videoUrl}&start={videoTs}"
+            else:
+                self.videoUrl = f"{self.videoUrl}?start={videoTs}"
