@@ -12,6 +12,9 @@ param tags object = {}
 @description('The name of an existing App Service Plan to connect to the VNet')
 param appServicePlanName string
 
+@description('The name of the Azure Container Apps environment to connect to the VNet')
+param acaManagedEnvironmentName string
+
 param usePrivateEndpoint bool = false
 
 @allowed(['appservice', 'containerapps'])
@@ -67,6 +70,22 @@ module vnet './core/networking/vnet.bicep' = if (usePrivateEndpoint) {
           addressPrefix: '10.0.4.0/24'
         }
       }
+      {
+        name: 'capp-subnet'
+        properties: {
+          addressPrefix: '10.0.5.0/24'
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+          delegations: [
+            {
+              name: acaManagedEnvironmentName
+              properties: {
+                serviceName: 'Microsoft.App/environments'
+              }
+            }
+          ]
+        }
+      }
     ]
   }
 }
@@ -74,4 +93,5 @@ module vnet './core/networking/vnet.bicep' = if (usePrivateEndpoint) {
 
 output appSubnetId string = usePrivateEndpoint ? vnet.outputs.vnetSubnets[2].id : ''
 output backendSubnetId string = usePrivateEndpoint ? vnet.outputs.vnetSubnets[0].id : ''
+output cappSubnetId string = usePrivateEndpoint ? vnet.outputs.vnetSubnets[4].id : ''
 output vnetName string = usePrivateEndpoint ? vnet.outputs.name : ''

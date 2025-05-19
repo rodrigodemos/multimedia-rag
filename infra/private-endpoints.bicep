@@ -81,7 +81,9 @@ module monitorDnsZones './core/networking/private-dns-zones.bicep' = [for monito
   }
 }]
 // Get blob DNS zone index for monitor private link
-var dnsZoneBlobIndex = filter(flatten(privateEndpointInfo), info => info.groupId == 'blob')[0].dnsZoneIndex
+// var dnsZoneBlobIndex = filter(flatten(privateEndpointInfo), info => info.groupId == 'blob')[0].dnsZoneIndex
+var blobInfoArray = filter(flatten(privateEndpointInfo), info => info.groupId == 'blob')
+var dnsZoneBlobIndex = length(blobInfoArray) > 0 ? blobInfoArray[0].dnsZoneIndex : 0
 
 // Azure Monitor Private Link Scope
 // https://learn.microsoft.com/azure/azure-monitor/logs/private-link-security

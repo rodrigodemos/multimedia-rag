@@ -3,6 +3,7 @@ param name string
 param location string = resourceGroup().location
 param tags object = {}
 
+param publicNetworkAccess string = ''
 
 @description('The number of CPU cores allocated to a single container instance, e.g., 0.5')
 param containerCpuCoreCount string = '0.5'

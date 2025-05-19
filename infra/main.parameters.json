@@ -308,8 +308,14 @@
     "containerRegistryCustomName": {
       "value": "${AZURE_CONTAINER_REGISTRY_NAME}"
     },
+    "containerRegistryResourceGroupName": {
+      "value": "${AZURE_CONTAINER_REGISTRY_RESOURCE_GROUP}"
+    },
     "acaIdentityCustomName": {
       "value": "${AZURE_CONTAINER_APPS_IDENTITY_NAME}"
+    },
+    "vnetName": {
+      "value": "${AZURE_VNET}"
     }
   }
 }

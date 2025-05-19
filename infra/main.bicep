@@ -14,7 +14,9 @@ param backendServiceName string = '' // Set in main.parameters.json
 param resourceGroupName string = '' // Set in main.parameters.json
 
 param containerRegistryCustomName string // Set in main.parameters.json
+param containerRegistryResourceGroupName string // Set in main.parameters.json
 param acaIdentityCustomName string // Set in main.parameters.json
+param vnetName string // Set in main.parameters.json
 
 param applicationInsightsDashboardName string = '' // Set in main.parameters.json
 param applicationInsightsName string = '' // Set in main.parameters.json
@@ -82,6 +84,7 @@ param chatHistoryVersion string = 'cosmosdb-v2'
   'canadaeast'
   'eastus'
   'eastus2'
+  'westus'
   'francecentral'
   'switzerlandnorth'
   'uksouth'
@@ -110,7 +113,7 @@ param documentIntelligenceResourceGroupName string = '' // Set in main.parameter
 // Limited regions for new version:
 // https://learn.microsoft.com/azure/ai-services/document-intelligence/concept-layout
 @description('Location for the Document Intelligence resource group')
-@allowed(['southcentralus', 'eastus', 'westus2', 'westeurope'])
+@allowed(['southcentralus', 'eastus', 'westus', 'westus2', 'westeurope'])
 @metadata({
   azd: {
     type: 'location'
@@ -476,8 +479,11 @@ module containerApps 'core/host/container-apps.bicep' = if (deploymentTarget == 
     location: location
     workloadProfile: azureContainerAppsWorkloadProfile
     containerAppsEnvironmentName: acaManagedEnvironmentName
+    containerRegistryResourceGroupName: containerRegistryResourceGroupName
     containerRegistryName: !empty(containerRegistryCustomName) ? containerRegistryCustomName : '${containerRegistryName}${resourceToken}'
     logAnalyticsWorkspaceResourceId: useApplicationInsights ? monitoring.outputs.logAnalyticsWorkspaceId : ''
+    publicNetworkAccess: publicNetworkAccess
+    virtualNetworkSubnetId: isolation.outputs.cappSubnetId
   }
 }
 
@@ -498,6 +504,7 @@ module acaBackend 'core/host/container-app-upsert.bicep' = if (deploymentTarget 
     containerRegistryName: (deploymentTarget == 'containerapps') ? containerApps.outputs.registryName : ''
     containerAppsEnvironmentName: (deploymentTarget == 'containerapps') ? containerApps.outputs.environmentName : ''
     identityType: 'UserAssigned'
+    publicNetworkAccess: publicNetworkAccess
     tags: union(tags, { 'azd-service-name': 'backend' })
     targetPort: 8000
     containerCpuCoreCount: '1.0'
@@ -693,6 +700,7 @@ module speech 'br/public:avm/res/cognitive-services/account:0.7.2' = if (useSpee
     sku: speechServiceSkuName
   }
 }
+
 module searchService 'core/search/search-services.bicep' = {
   name: 'search-service'
   scope: searchServiceResourceGroup
@@ -1067,16 +1075,17 @@ module isolation 'network-isolation.bicep' = {
     deploymentTarget: deploymentTarget
     location: location
     tags: tags
-    vnetName: '${abbrs.virtualNetworks}${resourceToken}'
+    vnetName: !empty(vnetName) ? vnetName : '${abbrs.virtualNetworks}${resourceToken}'
     // Need to check deploymentTarget due to https://github.com/Azure/bicep/issues/3990
     appServicePlanName: deploymentTarget == 'appservice' ? appServicePlan.outputs.name : ''
+    acaManagedEnvironmentName: deploymentTarget == 'containerapps' ? acaManagedEnvironmentName : ''
     usePrivateEndpoint: usePrivateEndpoint
   }
 }
 
 var environmentData = environment()
 
-var openAiPrivateEndpointConnection = (isAzureOpenAiHost && deployAzureOpenAi && deploymentTarget == 'appservice')
+var openAiPrivateEndpointConnection = (isAzureOpenAiHost && deployAzureOpenAi)
   ? [
       {
         groupId: 'account'
@@ -1090,7 +1099,28 @@ var openAiPrivateEndpointConnection = (isAzureOpenAiHost && deployAzureOpenAi &&
       }
     ]
   : []
-var otherPrivateEndpointConnections = (usePrivateEndpoint && deploymentTarget == 'appservice')
+
+var appServicePrivateEndpointConnection = (deploymentTarget == 'appservice' && usePrivateEndpoint)
+  ? [
+      {
+        groupId: 'sites'
+        dnsZoneName: 'privatelink.azurewebsites.net'
+        resourceIds: [backend.outputs.id]
+      }
+    ]
+  : []
+
+var acaPrivateEndpointConnection = (deploymentTarget == 'containerapps' && usePrivateEndpoint)
+  ? [
+      {
+        groupId: 'containerApps'
+        dnsZoneName: 'privatelink.azurecontainerapps.io'
+        resourceIds: [acaBackend.outputs.id]
+      }
+    ]
+  : []
+
+var otherPrivateEndpointConnections = (usePrivateEndpoint)
   ? [
       {
         groupId: 'blob'
@@ -1103,21 +1133,21 @@ var otherPrivateEndpointConnections = (usePrivateEndpoint && deploymentTarget ==
         resourceIds: [searchService.outputs.id]
       }
       {
-        groupId: 'sites'
-        dnsZoneName: 'privatelink.azurewebsites.net'
-        resourceIds: [backend.outputs.id]
-      }
-      {
         groupId: 'sql'
         dnsZoneName: 'privatelink.documents.azure.com'
         resourceIds: (useAuthentication && useChatHistoryCosmos) ? [cosmosDb.outputs.resourceId] : []
       }
+      {
+        groupId: 'acr'
+        dnsZoneName: 'privatelink.azurecr.io'
+        resourceIds: (deploymentTarget == 'containerapps') ? [containerApps.outputs.registryId] : []
+      }
     ]
   : []
 
-var privateEndpointConnections = concat(otherPrivateEndpointConnections, openAiPrivateEndpointConnection)
+var privateEndpointConnections = concat(otherPrivateEndpointConnections, openAiPrivateEndpointConnection, appServicePrivateEndpointConnection, acaPrivateEndpointConnection)
 
-module privateEndpoints 'private-endpoints.bicep' = if (usePrivateEndpoint && deploymentTarget == 'appservice') {
+module privateEndpoints 'private-endpoints.bicep' = if (usePrivateEndpoint) {
   name: 'privateEndpoints'
   scope: resourceGroup
   params: {

@@ -9,6 +9,7 @@ param containerRegistryResourceGroupName string = ''
 param containerRegistryAdminUserEnabled bool = false
 param logAnalyticsWorkspaceResourceId string
 param applicationInsightsName string = '' // Not used here, was used for DAPR
+param publicNetworkAccess string = ''
 param virtualNetworkSubnetId string = ''
 @allowed(['Consumption', 'D4', 'D8', 'D16', 'D32', 'E4', 'E8', 'E16', 'E32', 'NC24-A100', 'NC48-A100', 'NC96-A100'])
 param workloadProfile string
@@ -66,6 +67,8 @@ module containerRegistry 'br/public:avm/res/container-registry/registry:0.5.1' =
     : resourceGroup()
   params: {
     name: containerRegistryName
+    acrSku: publicNetworkAccess == 'Disabled' ? 'Premium' : 'Standard'
+    publicNetworkAccess: publicNetworkAccess
     location: location
     acrAdminUserEnabled: containerRegistryAdminUserEnabled
     tags: tags
@@ -78,3 +81,4 @@ output environmentId string = containerAppsEnvironment.outputs.resourceId
 
 output registryLoginServer string = containerRegistry.outputs.loginServer
 output registryName string = containerRegistry.outputs.name
+output registryId string = containerRegistry.outputs.resourceId
