@@ -24,33 +24,12 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' existing = if (de
   name: appServicePlanName
 }
 
-module vnet './core/networking/vnet.bicep' = if (usePrivateEndpoint) {
-  name: 'vnet'
-  params: {
-    name: vnetName
-    location: location
-    tags: tags
-    subnets: [
-      {
-        name: 'backend-subnet'
-        properties: {
-          addressPrefix: '10.0.1.0/24'
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-        }
-      }
-      {
-        name: 'AzureBastionSubnet'
-        properties: {
-          addressPrefix: '10.0.2.0/24'
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-        }
-      }
+var appSubnet = deploymentTarget == 'appservice' 
+  ? [
       {
         name: 'app-int-subnet'
         properties: {
-          addressPrefix: '10.0.3.0/24'
+          addressPrefix: '10.0.2.0/24'
           privateEndpointNetworkPolicies: 'Enabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
           delegations: [
@@ -64,16 +43,13 @@ module vnet './core/networking/vnet.bicep' = if (usePrivateEndpoint) {
           ]
         }
       }
-      {
-        name: 'vm-subnet'
-        properties: {
-          addressPrefix: '10.0.4.0/24'
-        }
-      }
+
+  ]
+  : [
       {
         name: 'capp-subnet'
         properties: {
-          addressPrefix: '10.0.5.0/24'
+          addressPrefix: '10.0.2.0/24'
           privateEndpointNetworkPolicies: 'Enabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
           delegations: [
@@ -86,12 +62,34 @@ module vnet './core/networking/vnet.bicep' = if (usePrivateEndpoint) {
           ]
         }
       }
-    ]
+
+  ]
+
+  var subnets = concat(
+    [
+      {
+        name: 'backend-subnet'
+        properties: {
+          addressPrefix: '10.0.1.0/24'
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+        }
+      }
+    ],
+    appSubnet
+  )
+
+module vnet './core/networking/vnet.bicep' = if (usePrivateEndpoint) {
+  name: 'vnet'
+  params: {
+    name: vnetName
+    location: location
+    tags: tags
+    subnets: subnets
   }
 }
 
 
-output appSubnetId string = usePrivateEndpoint ? vnet.outputs.vnetSubnets[2].id : ''
 output backendSubnetId string = usePrivateEndpoint ? vnet.outputs.vnetSubnets[0].id : ''
-output cappSubnetId string = usePrivateEndpoint ? vnet.outputs.vnetSubnets[4].id : ''
+output appSubnetId string = usePrivateEndpoint ? vnet.outputs.vnetSubnets[1].id : ''
 output vnetName string = usePrivateEndpoint ? vnet.outputs.name : ''

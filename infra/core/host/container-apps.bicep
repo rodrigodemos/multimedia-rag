@@ -10,9 +10,14 @@ param containerRegistryAdminUserEnabled bool = false
 param logAnalyticsWorkspaceResourceId string
 param applicationInsightsName string = '' // Not used here, was used for DAPR
 param publicNetworkAccess string = ''
+param vnetName string
+param usePrivateEndpoint bool
+param vnetPeSubnetId string
 param virtualNetworkSubnetId string = ''
 @allowed(['Consumption', 'D4', 'D8', 'D16', 'D32', 'E4', 'E8', 'E16', 'E32', 'NC24-A100', 'NC48-A100', 'NC96-A100'])
 param workloadProfile string
+
+var abbrs = loadJsonContent('../../abbreviations.json')
 
 var workloadProfiles = workloadProfile == 'Consumption'
   ? [
@@ -72,6 +77,28 @@ module containerRegistry 'br/public:avm/res/container-registry/registry:0.5.1' =
     location: location
     acrAdminUserEnabled: containerRegistryAdminUserEnabled
     tags: tags
+  }
+}
+
+module dnsZones '../networking/private-dns-zones.bicep' = if (usePrivateEndpoint) {
+  name: 'registry-dnszone'
+  params: {
+    dnsZoneName: 'acurecr.io'
+    tags: tags
+    virtualNetworkName: vnetName
+  }
+}
+
+module privateEndpoints '../networking/private-endpoint.bicep' = if (usePrivateEndpoint) {
+  name: '${containerRegistryName}-privateendpoint'
+  params: {
+    location: location
+    name: '${containerRegistryName}${abbrs.privateEndpoint}'
+    tags: tags
+    subnetId: vnetPeSubnetId
+    serviceId: containerRegistry.outputs.resourceId
+    groupIds: [ 'registry' ]
+    dnsZoneId: dnsZones.outputs.id
   }
 }
 

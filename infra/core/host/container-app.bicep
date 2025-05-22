@@ -110,6 +110,10 @@ module containerRegistryAccess '../security/registry-access.bicep' = if (usePriv
   }
 }
 
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' existing = {
+  name: containerAppsEnvironmentName
+}
+
 resource app 'Microsoft.App/containerApps@2023-05-02-preview' = {
   name: name
   location: location
@@ -170,10 +174,6 @@ resource app 'Microsoft.App/containerApps@2023-05-02-preview' = {
       }
     }
   }
-}
-
-resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' existing = {
-  name: containerAppsEnvironmentName
 }
 
 output defaultDomain string = containerAppsEnvironment.properties.defaultDomain

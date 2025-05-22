@@ -483,7 +483,10 @@ module containerApps 'core/host/container-apps.bicep' = if (deploymentTarget == 
     containerRegistryName: !empty(containerRegistryCustomName) ? containerRegistryCustomName : '${containerRegistryName}${resourceToken}'
     logAnalyticsWorkspaceResourceId: useApplicationInsights ? monitoring.outputs.logAnalyticsWorkspaceId : ''
     publicNetworkAccess: publicNetworkAccess
-    virtualNetworkSubnetId: isolation.outputs.cappSubnetId
+    usePrivateEndpoint: usePrivateEndpoint
+    virtualNetworkSubnetId: isolation.outputs.appSubnetId
+    vnetName: isolation.outputs.vnetName
+    vnetPeSubnetId: isolation.outputs.backendSubnetId
   }
 }
 
@@ -1137,11 +1140,11 @@ var otherPrivateEndpointConnections = (usePrivateEndpoint)
         dnsZoneName: 'privatelink.documents.azure.com'
         resourceIds: (useAuthentication && useChatHistoryCosmos) ? [cosmosDb.outputs.resourceId] : []
       }
-      {
-        groupId: 'acr'
-        dnsZoneName: 'privatelink.azurecr.io'
-        resourceIds: (deploymentTarget == 'containerapps') ? [containerApps.outputs.registryId] : []
-      }
+      // {
+      //   groupId: 'acr'
+      //   dnsZoneName: 'privatelink.azurecr.io'
+      //   resourceIds: (deploymentTarget == 'containerapps') ? [containerApps.outputs.registryId] : []
+      // }
     ]
   : []
 
