@@ -19,6 +19,8 @@ param workloadProfile string
 
 var abbrs = loadJsonContent('../../abbreviations.json')
 
+var acrPullRole = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
+
 var workloadProfiles = workloadProfile == 'Consumption'
   ? [
       {
@@ -77,6 +79,19 @@ module containerRegistry 'br/public:avm/res/container-registry/registry:0.5.1' =
     location: location
     acrAdminUserEnabled: containerRegistryAdminUserEnabled
     tags: tags
+  }
+}
+
+
+module openAiRoleUser '../security/role.bicep' = {
+  scope: !empty(containerRegistryResourceGroupName)
+    ? resourceGroup(containerRegistryResourceGroupName)
+    : resourceGroup()
+  name: 'aca-env-acr'
+  params: {
+    principalId: containerAppsEnvironment.outputs.systemAssignedMIPrincipalId
+    roleDefinitionId: acrPullRole
+    principalType: 'ServicePrincipal'
   }
 }
 
