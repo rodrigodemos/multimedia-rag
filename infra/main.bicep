@@ -1115,11 +1115,11 @@ var appServicePrivateEndpointConnection = (deploymentTarget == 'appservice' && u
 
 var acaPrivateEndpointConnection = (deploymentTarget == 'containerapps' && usePrivateEndpoint)
   ? [
-      {
-        groupId: 'containerApps'
-        dnsZoneName: 'privatelink.azurecontainerapps.io'
-        resourceIds: [acaBackend.outputs.id]
-      }
+      // {
+      //   groupId: 'containerApps'
+      //   dnsZoneName: 'privatelink.azurecontainerapps.io'
+      //   resourceIds: [acaBackend.outputs.id]
+      // }
     ]
   : []
 

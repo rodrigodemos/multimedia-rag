@@ -55,11 +55,11 @@ module containerAppsEnvironment 'br/public:avm/res/app/managed-environment:0.8.0
     } : {
       userAssignedResourceIds: userAssignedIdentityResourceIds
     }
-
     name: containerAppsEnvironmentName
     // Non-required parameters
     infrastructureResourceGroupName: containerRegistryResourceGroupName
     infrastructureSubnetId: virtualNetworkSubnetId
+    internal: usePrivateEndpoint
     location: location
     tags: tags
     zoneRedundant: false
@@ -82,15 +82,14 @@ module containerRegistry 'br/public:avm/res/container-registry/registry:0.5.1' =
   }
 }
 
-
-module openAiRoleUser '../security/role.bicep' = {
+module acaEnvRole '../security/role.bicep' = {
   scope: !empty(containerRegistryResourceGroupName)
     ? resourceGroup(containerRegistryResourceGroupName)
     : resourceGroup()
   name: 'aca-env-acr'
   params: {
     principalId: containerAppsEnvironment.outputs.systemAssignedMIPrincipalId
-    roleDefinitionId: acrPullRole
+    roleDefinitionId: '7f951dda-4ed3-4680-a7ca-43fe172d538d'
     principalType: 'ServicePrincipal'
   }
 }
@@ -98,13 +97,13 @@ module openAiRoleUser '../security/role.bicep' = {
 module dnsZones '../networking/private-dns-zones.bicep' = if (usePrivateEndpoint) {
   name: 'registry-dnszone'
   params: {
-    dnsZoneName: 'acurecr.io'
+    dnsZoneName: 'privatelink.azurecr.io'
     tags: tags
     virtualNetworkName: vnetName
   }
 }
 
-module privateEndpoints '../networking/private-endpoint.bicep' = if (usePrivateEndpoint) {
+module ACRprivateEndpoint '../networking/private-endpoint.bicep' = if (usePrivateEndpoint) {
   name: '${containerRegistryName}-privateendpoint'
   params: {
     location: location
